@@ -57,6 +57,7 @@ public class GameScreen extends ScreenAdapter {
         body.createFixture(fixtureDef);
         pShape.dispose();
 
+
         // Create platform
         bodyDef.position.set(0f,-3f);
         bodyDef.gravityScale = 1;
