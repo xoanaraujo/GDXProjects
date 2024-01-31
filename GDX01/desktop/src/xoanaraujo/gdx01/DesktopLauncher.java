@@ -2,16 +2,20 @@ package xoanaraujo.gdx01;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import xoanaraujo.gdx01.Core;
 import xoanaraujo.gdx01.util.GameConst;
+
+import static xoanaraujo.gdx01.util.GameConst.UNIT_SCALE;
+
 
 // Please note that on macOS your application needs to be started with the -XstartOnFirstThread JVM argument
 public class DesktopLauncher {
-	public static void main (String[] arg) {
-		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setForegroundFPS(60);
-		config.setTitle("GDX01");
-		config.setWindowedMode(100 * GameConst.WORLD_WIDTH,  100 * GameConst.WORLD_HEIGHT);
-		new Lwjgl3Application(new Core(), config);
-	}
+    private static final float SCALE = 3f;
+
+    public static void main(String[] arg) {
+        Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+        config.setForegroundFPS(60);
+        config.setTitle("GDX01");
+        config.setWindowedMode((int) (GameConst.WORLD_WIDTH / UNIT_SCALE * SCALE), (int) (GameConst.WORLD_HEIGHT / UNIT_SCALE * SCALE));
+        new Lwjgl3Application(new Core(), config);
+    }
 }

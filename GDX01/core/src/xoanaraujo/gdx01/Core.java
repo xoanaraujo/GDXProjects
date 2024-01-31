@@ -4,6 +4,11 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -20,34 +25,45 @@ import static xoanaraujo.gdx01.util.GameConst.*;
 
 public class Core extends Game {
     private static final String TAG = Core.class.getSimpleName();
-    //
-    private static final Float FIXED_TIME_STEP = 1f / FPS;
     private EnumMap<ScreenType, Screen> screens;
     private FitViewport viewport;
+    private OrthographicCamera camera;
     private World world;
     private WorldContactAdapter worldContactAdapter;
     private Box2DDebugRenderer debugRenderer;
+    private AssetManager assetManager;
+    private SpriteBatch batch;
+    private static final Float FIXED_TIME_STEP = 1f / FPS;
     private Float updateTime;
 
     @Override
     public void create() {
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
         Gdx.app.debug(TAG, "FPS: " + Gdx.graphics.getFramesPerSecond());
-
+        batch = new SpriteBatch();
         Box2D.init();
 
         screens = new EnumMap<>(ScreenType.class);
-        viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT);
+        camera = new OrthographicCamera();
+        viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
 
         debugRenderer = new Box2DDebugRenderer();
 
-        world = new World(new Vector2(0, -9.81f), true);
+        world = new World(new Vector2(0, -10f), true);
         worldContactAdapter = new WorldContactAdapter();
         world.setContactListener(worldContactAdapter);
 
+        assetManager = new AssetManager();
+        assetManager.setLoader(TiledMap.class, new TmxMapLoader(assetManager.getFileHandleResolver()));
+        initializeSkin();
         updateTime = 0f;
 
         switchScreen(ScreenType.LOADING);
+    }
+
+    private void initializeSkin() {
+        // Generate ttf bitmaps
+        // load skin
     }
 
     @Override
@@ -68,6 +84,8 @@ public class Core extends Game {
         super.dispose();
         world.dispose();
         debugRenderer.dispose();
+        assetManager.dispose();
+        batch.dispose();
     }
 
     /**
@@ -99,11 +117,23 @@ public class Core extends Game {
         return viewport;
     }
 
+    public OrthographicCamera getCamera() {
+        return camera;
+    }
+
     public World getWorld() {
         return world;
     }
 
     public Box2DDebugRenderer getDebugRenderer() {
         return debugRenderer;
+    }
+
+    public AssetManager getAssetManager() {
+        return assetManager;
+    }
+
+    public SpriteBatch getBatch() {
+        return batch;
     }
 }
