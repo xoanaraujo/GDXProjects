@@ -6,7 +6,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
@@ -63,7 +66,18 @@ public class Core extends Game {
 
     private void initializeSkin() {
         // Generate ttf bitmaps
+        final FreeTypeFontGenerator fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("ui/font/alagard.ttf"));
+        final FreeTypeFontGenerator.FreeTypeFontParameter fontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        fontParameter.minFilter = Texture.TextureFilter.Nearest;
+        fontParameter.magFilter = Texture.TextureFilter.Nearest;
+        final int[] sizesToCreate = {16, 20, 26, 32};
+        for (int size : sizesToCreate) {
+            fontParameter.size = size;
+            fontGenerator.generateFont(fontParameter);
+        }
+        fontGenerator.dispose();
         // load skin
+        
     }
 
     @Override
