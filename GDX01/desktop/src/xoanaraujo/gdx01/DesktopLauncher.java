@@ -15,7 +15,7 @@ public class DesktopLauncher {
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
         config.setForegroundFPS(60);
         config.setTitle("GDX01");
-        config.setWindowedMode((int) (GameConst.WORLD_WIDTH / UNIT_SCALE * SCALE), (int) (GameConst.WORLD_HEIGHT / UNIT_SCALE * SCALE));
+        config.setWindowedMode(GameConst.WIDTH, (int) (GameConst.HEIGHT));
         new Lwjgl3Application(new Core(), config);
     }
 }

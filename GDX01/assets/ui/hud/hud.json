@@ -24,36 +24,23 @@
       "font": "font_32",
       "fontColor": "white"
     },
-    "info_frame": {
-      "font": "font_16",
-      "fontColor": "white",
-      "up": "frame_brown"
-    },
     "info": {
       "font": "font_16",
       "fontColor": "white"
     }
   },
-  "com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle": {
-
-  },
   "com.badlogic.gdx.scenes.scene2d.ui.ProgressBar$ProgressBarStyle": {
     "default": {
-      "background": "knobAfter",
-      "knob": "knob",
-      "knobBefore": "knobBefore"
+      "background": "bar_empty",
+      "knob": "bar_green_middle",
+      "knobBefore": "bar_green_edge"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle": {
     "default": {
-      "background": "knobAfter",
-      "knob": "knob",
-      "knobBefore": "knobBefore"
+      "background": "bar_green_edge",
+      "knob": "bar_green_middle",
+      "knobBefore": "bar_green_edge"
     },
-    "deactivated": {
-      "background": "knobAfter",
-      "knob": "knobDeactivated",
-      "knobBefore": "knobBeforeDeactivated"
-    }
   }
 }

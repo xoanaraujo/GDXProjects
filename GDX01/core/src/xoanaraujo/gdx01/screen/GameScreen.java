@@ -5,23 +5,21 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
-import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.MapObject;
-import com.badlogic.gdx.maps.MapObjects;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.ScreenUtils;
 import xoanaraujo.gdx01.Core;
 import xoanaraujo.gdx01.entity.Player;
 import xoanaraujo.gdx01.map.CollisionArea;
 import xoanaraujo.gdx01.map.MyMap;
+import xoanaraujo.gdx01.ui.GameUI;
 
 import static xoanaraujo.gdx01.util.GameConst.*;
 
-public class GameScreen extends ScreenAdapter {
+public class GameScreen extends ScreenAdapter<GameUI> {
 
     private static final String TAG = GameScreen.class.getSimpleName();
     private static final Color BACKGROUND = new Color(0.1f, 0.1f, 0.1f, 1f);
@@ -50,6 +48,11 @@ public class GameScreen extends ScreenAdapter {
         spawnCollisionsAreas();
 
         spawnPlayer();
+    }
+
+    @Override
+    protected GameUI getScreenUI(Skin skin) {
+        return new GameUI(skin);
     }
 
     private void spawnPlayer() {
@@ -107,12 +110,6 @@ public class GameScreen extends ScreenAdapter {
         fixtureDef.filter.maskBits = -1;
         fixtureDef.shape = null;
     }
-
-    @Override
-    public void show() {
-
-    }
-
     @Override
     public void render(float delta) {
         ScreenUtils.clear(BACKGROUND);
@@ -132,15 +129,9 @@ public class GameScreen extends ScreenAdapter {
     }
 
     @Override
-    public void hide() {
-
-    }
-
-    @Override
     public void dispose() {
         mapRenderer.dispose(); // GameScreen doesn't own the batch. This is not needed.
     }
-
     /*// Create a circle
         bodyDef.position.set(0f, 2f);
         bodyDef.gravityScale = 1;

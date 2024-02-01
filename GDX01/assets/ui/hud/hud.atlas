@@ -1,0 +1,9 @@
+hud.png
+size:64,32
+repeat:none
+bar_empty
+bounds:2,9,48,16
+bar_green_edge
+bounds:2,2,1,5
+bar_green_middle
+bounds:52,20,1,5
