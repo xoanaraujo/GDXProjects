@@ -1,6 +1,7 @@
 package xoanaraujo.gdx01.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -9,7 +10,6 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.ScreenUtils;
 import xoanaraujo.gdx01.Core;
 import xoanaraujo.gdx01.entity.Player;
@@ -19,8 +19,7 @@ import xoanaraujo.gdx01.ui.GameUI;
 
 import static xoanaraujo.gdx01.util.GameConst.*;
 
-public class GameScreen extends ScreenAdapter<GameUI> {
-
+public class GameScreen extends ScreenAbstract<GameUI> {
     private static final String TAG = GameScreen.class.getSimpleName();
     private static final Color BACKGROUND = new Color(0.1f, 0.1f, 0.1f, 1f);
     private final BodyDef bodyDef;
@@ -53,6 +52,11 @@ public class GameScreen extends ScreenAdapter<GameUI> {
     @Override
     protected GameUI getScreenUI(Skin skin) {
         return new GameUI(skin);
+    }
+
+    @Override
+    protected InputAdapter getInputAdapter() {
+        return null;
     }
 
     private void spawnPlayer() {

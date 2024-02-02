@@ -1,16 +1,17 @@
 package xoanaraujo.gdx01.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.ScreenUtils;
 import xoanaraujo.gdx01.Core;
+import xoanaraujo.gdx01.input.LoadingInput;
 import xoanaraujo.gdx01.ui.LoadingUI;
 
-public class LoadingScreen extends ScreenAdapter<LoadingUI> {
+public class LoadingScreen extends ScreenAbstract<LoadingUI> {
     private final AssetManager assetManager;
     private static final Color BACKGROUND = new Color(0.1f, 0.1f, 0.1f, 1f);
 
@@ -26,12 +27,15 @@ public class LoadingScreen extends ScreenAdapter<LoadingUI> {
     }
 
     @Override
+    protected InputAdapter getInputAdapter() {
+        return new LoadingInput(this);
+    }
+
+    @Override
     public void render(float delta) {
         ScreenUtils.clear(BACKGROUND);
 
-        if(assetManager.update() && Gdx.input.isTouched()){
-            context.switchScreen(ScreenType.GAME);
-        }
+        assetManager.update();
         screenUI.updateProgressBar(assetManager.getProgress());
     }
 
@@ -49,4 +53,5 @@ public class LoadingScreen extends ScreenAdapter<LoadingUI> {
     public void dispose() {
 
     }
+
 }
