@@ -1,17 +1,18 @@
 package xoanaraujo.gdx01.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import xoanaraujo.gdx01.Core;
-import xoanaraujo.gdx01.input.LoadingInput;
+import xoanaraujo.gdx01.audio.AudioType;
+import xoanaraujo.gdx01.input.GameKeys;
+import xoanaraujo.gdx01.input.InputManager;
 import xoanaraujo.gdx01.ui.LoadingUI;
 
-public class LoadingScreen extends ScreenAbstract<LoadingUI> {
+public class LoadingScreen extends AbstractScreen<LoadingUI>{
+    private static final String TAG = LoadingScreen.class.getSimpleName();
     private final AssetManager assetManager;
     private static final Color BACKGROUND = new Color(0.1f, 0.1f, 0.1f, 1f);
 
@@ -22,13 +23,20 @@ public class LoadingScreen extends ScreenAbstract<LoadingUI> {
     }
 
     @Override
-    protected LoadingUI getScreenUI(Skin skin) {
-        return new LoadingUI(skin);
+    protected LoadingUI getScreenUI(Core context) {
+        return new LoadingUI(context);
     }
 
     @Override
-    protected InputAdapter getInputAdapter() {
-        return new LoadingInput(this);
+    public void show() {
+        super.show();
+
+    }
+
+    @Override
+    public void hide() {
+        super.hide();
+        audioManager.stopMusic();
     }
 
     @Override
@@ -37,6 +45,10 @@ public class LoadingScreen extends ScreenAbstract<LoadingUI> {
 
         assetManager.update();
         screenUI.updateProgressBar(assetManager.getProgress());
+        if(!isMusicLoaded && assetManager.isLoaded(AudioType.ZELDA.getPath())){
+            isMusicLoaded = true;
+            audioManager.playAudio(AudioType.ZELDA);
+        }
     }
 
     @Override
@@ -54,4 +66,17 @@ public class LoadingScreen extends ScreenAbstract<LoadingUI> {
 
     }
 
+    @Override
+    public void keyDown(InputManager manager, GameKeys gameKey) {
+        Gdx.app.debug(TAG, "keyDown");
+
+        if (assetManager.getProgress() >= 1){
+            context.switchScreen(ScreenType.GAME);
+        }
+    }
+
+    @Override
+    public void keyUp(InputManager manager, GameKeys gameKey) {
+
+    }
 }

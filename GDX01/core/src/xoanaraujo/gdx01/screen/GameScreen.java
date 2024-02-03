@@ -3,23 +3,27 @@ package xoanaraujo.gdx01.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import xoanaraujo.gdx01.Core;
+import xoanaraujo.gdx01.audio.AudioType;
 import xoanaraujo.gdx01.entity.Player;
+import xoanaraujo.gdx01.input.GameKeys;
+import xoanaraujo.gdx01.input.InputManager;
 import xoanaraujo.gdx01.map.CollisionArea;
 import xoanaraujo.gdx01.map.MyMap;
 import xoanaraujo.gdx01.ui.GameUI;
 
 import static xoanaraujo.gdx01.util.GameConst.*;
 
-public class GameScreen extends ScreenAbstract<GameUI> {
+public class GameScreen extends AbstractScreen<GameUI> {
     private static final String TAG = GameScreen.class.getSimpleName();
     private static final Color BACKGROUND = new Color(0.1f, 0.1f, 0.1f, 1f);
     private final BodyDef bodyDef;
@@ -30,33 +34,30 @@ public class GameScreen extends ScreenAbstract<GameUI> {
     private final GLProfiler glProfiler;
     private final MyMap map;
     private Player player;
-
     public GameScreen(Core context) {
         super(context);
+
         camera = context.getCamera();
-        mapRenderer = new OrthogonalTiledMapRenderer(null, UNIT_SCALE, context.getBatch());
+
         assetManager = context.getAssetManager();
+
         glProfiler = new GLProfiler(Gdx.graphics);
         glProfiler.enable();
         bodyDef = new BodyDef();
         fixtureDef = new FixtureDef();
 
+        mapRenderer = new OrthogonalTiledMapRenderer(null, UNIT_SCALE, context.getBatch());
         final TiledMap tiledMap = assetManager.get("map/map.tmx", TiledMap.class);
         mapRenderer.setMap(tiledMap);
         map = new MyMap(tiledMap);
-        spawnCollisionsAreas();
 
+        spawnCollisionsAreas();
         spawnPlayer();
     }
 
     @Override
-    protected GameUI getScreenUI(Skin skin) {
-        return new GameUI(skin);
-    }
-
-    @Override
-    protected InputAdapter getInputAdapter() {
-        return null;
+    protected GameUI getScreenUI(Core context) {
+        return new GameUI(context);
     }
 
     private void spawnPlayer() {
@@ -114,12 +115,33 @@ public class GameScreen extends ScreenAbstract<GameUI> {
         fixtureDef.filter.maskBits = -1;
         fixtureDef.shape = null;
     }
+
+    @Override
+    public void show() {
+        super.show();
+
+    }
+
+    @Override
+    public void hide() {
+        super.hide();
+        audioManager.stopMusic();
+    }
+
     @Override
     public void render(float delta) {
         ScreenUtils.clear(BACKGROUND);
+        Gdx.app.debug(TAG, String.valueOf(assetManager.isLoaded(AudioType.MAIN.getPath())));
+        if(!isMusicLoaded && assetManager.isLoaded(AudioType.MAIN.getPath())){
+            isMusicLoaded = true;
+            audioManager.playAudio(AudioType.MAIN);
+        }
+
         viewport.apply(true);
         mapRenderer.setView(camera);
         mapRenderer.render();
+        screenUI.updateFPS((int) (FPS / delta));
+        player.move();
     }
 
     @Override
@@ -136,58 +158,60 @@ public class GameScreen extends ScreenAbstract<GameUI> {
     public void dispose() {
         mapRenderer.dispose(); // GameScreen doesn't own the batch. This is not needed.
     }
-    /*// Create a circle
-        bodyDef.position.set(0f, 2f);
-        bodyDef.gravityScale = 1;
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        Body body = world.createBody(bodyDef);
-        body.setUserData("CIRCLE");
 
-        fixtureDef.isSensor = false;
-        fixtureDef.restitution = 0.5f;
-        fixtureDef.friction = 0.2f;
-        fixtureDef.filter.categoryBits = BIT_CIRCLE;
-        fixtureDef.filter.maskBits = BIT_GROUND | BIT_BOX;
-        CircleShape cShape = new CircleShape();
-        cShape.setRadius(0.5f);
-        fixtureDef.shape = cShape;
-        body.createFixture(fixtureDef);
-        cShape.dispose();
+    public Player getPlayer() {
+        return player;
+    }
 
-        // Create a box
-        bodyDef.position.set(0.9f, -2.75f);
-        bodyDef.gravityScale = 1;
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        body = world.createBody(bodyDef);
-        body.setUserData("BOX");
+    @Override
+    public void keyDown(InputManager manager, GameKeys gameKey) {
+        switch (gameKey){
+            case UP: {
+                player.getDirection().y = 1;
+                player.setDirectionChanged(true);
+            } break;
+            case DOWN: {
+                player.getDirection().y = -1;
+                player.setDirectionChanged(true);
+            } break;
+            case RIGHT: {
+                player.getDirection().x = 1;
+                player.setDirectionChanged(true);
+            } break;
+            case LEFT: {
+                player.getDirection().x = -1;
+                player.setDirectionChanged(true);
+            } break;
+            case SELECT: {
+                System.out.println("Illo no esta aun implementado el select hehe");
+            } break;
 
-        fixtureDef.isSensor = false;
-        fixtureDef.restitution = 0.5f;
-        fixtureDef.friction = 0.2f;
-        fixtureDef.filter.categoryBits = BIT_BOX;
-        fixtureDef.filter.maskBits = BIT_GROUND | BIT_CIRCLE;
-        PolygonShape pShape = new PolygonShape();
-        pShape.setAsBox(0.5f, 0.5f);
-        fixtureDef.shape = pShape;
-        body.createFixture(fixtureDef);
-        pShape.dispose();
+        }
+    }
 
+    @Override
+    public void keyUp(InputManager manager, GameKeys gameKey) {
+        switch (gameKey){
+            case UP: {
+                player.getDirection().y = manager.isKeyPressed(GameKeys.DOWN) ? -1 : 0;
+                player.setDirectionChanged(true);
+            } break;
+            case DOWN: {
+                player.getDirection().y = manager.isKeyPressed(GameKeys.UP) ? 1 : 0;
+                player.setDirectionChanged(true);
+            } break;
+            case RIGHT: {
+                player.getDirection().x = manager.isKeyPressed(GameKeys.LEFT) ? -1 : 0;
+                player.setDirectionChanged(true);
+            } break;
+            case LEFT: {
+                player.getDirection().x = manager.isKeyPressed(GameKeys.RIGHT) ? 1 : 0;
+                player.setDirectionChanged(true);
+            } break;
+            case SELECT: {
+                System.out.println("Illo no esta aun implementado el select hehe");
+            } break;
 
-        // Create platform
-        bodyDef.position.set(0f,-3f);
-        bodyDef.gravityScale = 1;
-        bodyDef.type = BodyDef.BodyType.StaticBody;
-        body = world.createBody(bodyDef);
-        body.setUserData("PLATFORM");
-
-        fixtureDef.isSensor = false;
-        fixtureDef.restitution = 0.1f;
-        fixtureDef.friction = 0.2f;
-        fixtureDef.filter.categoryBits = BIT_GROUND;
-        fixtureDef.filter.maskBits = -1;
-        pShape = new PolygonShape();
-        pShape.setAsBox(3.5f, 0.25f);
-        fixtureDef.shape = pShape;
-        body.createFixture(fixtureDef);
-        pShape.dispose();*/
+        }
+    }
 }

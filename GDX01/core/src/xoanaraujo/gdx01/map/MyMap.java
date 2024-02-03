@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.objects.PolylineMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Polyline;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -59,6 +60,10 @@ public class MyMap {
                 final PolylineMapObject polylineMapObject = (PolylineMapObject) mapObject;
                 final Polyline polyline = polylineMapObject.getPolyline();
                 collisionAreas.add(new CollisionArea(polyline.getX(), polyline.getY(), polyline.getVertices()));
+            } else if (mapObject instanceof PolygonMapObject) {
+                final PolygonMapObject polygonMapObject = (PolygonMapObject) mapObject;
+                final Polygon polygon = polygonMapObject.getPolygon();
+                collisionAreas.add(new CollisionArea(polygon.getX(), polygon.getY(), polygon.getVertices()));
             } else {
                 Gdx.app.debug(TAG, "MapObject of type " + mapObject.getClass() + " not allowed");
                 

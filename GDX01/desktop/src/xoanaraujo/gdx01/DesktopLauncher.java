@@ -1,5 +1,7 @@
 package xoanaraujo.gdx01;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import xoanaraujo.gdx01.util.GameConst;
@@ -13,9 +15,9 @@ public class DesktopLauncher {
 
     public static void main(String[] arg) {
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-        config.setForegroundFPS(60);
         config.setTitle("GDX01");
-        config.setWindowedMode(GameConst.WIDTH, (int) (GameConst.HEIGHT));
+        config.setForegroundFPS(60);
+        config.setWindowedMode(GameConst.WIDTH, (GameConst.HEIGHT));
         new Lwjgl3Application(new Core(), config);
     }
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="9">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="10">
  <tileset firstgid="1" source="tileset.tsx"/>
  <layer id="1" name="Tile Layer 1" width="20" height="20">
   <data encoding="base64">
@@ -16,12 +16,12 @@
    <polyline points="0,0 64,0 64,-112 128,-112 128,-80 144,-80 144,-112 240,-112 240,-16 208,-16 208,0 240,0 240,64 208,64 208,80 240,80 240,160 224,160 224,112 176,112 176,160 144,160 144,128 128,128 128,160 64,160 64,64 -48,64 -48,0 -16,0 -16,-32 0,-32 0,0"/>
   </object>
   <object id="7" x="192" y="64" width="64" height="64"/>
-  <object id="8" x="208" y="240">
-   <polygon points="0,0 -16,0 -16,-48 48,-48 48,-32 0,-32"/>
+  <object id="9" x="192" y="192">
+   <polygon points="0,0 64,0 64,16 16,16 16,48 0,48 0,0"/>
   </object>
  </objectgroup>
  <objectgroup id="3" name="gameObjects"/>
- <objectgroup id="4" name="startPlayerLocation">
+ <objectgroup id="4" name="startPlayerLocation" visible="0">
   <object id="1" x="48" y="112">
    <point/>
   </object>
