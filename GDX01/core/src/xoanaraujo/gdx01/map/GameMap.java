@@ -16,13 +16,13 @@ import com.badlogic.gdx.utils.Array;
 
 import static xoanaraujo.gdx01.util.GameConst.UNIT_SCALE;
 
-public class MyMap {
-    private static final String TAG = MyMap.class.getSimpleName();
+public class GameMap {
+    private static final String TAG = GameMap.class.getSimpleName();
     private TiledMap tiledMap;
     private Array<CollisionArea> collisionAreas;
     private Vector2 startPlayerLocation;
 
-    public MyMap(TiledMap tiledMap) {
+    public GameMap(TiledMap tiledMap) {
         this.tiledMap = tiledMap;
         this.collisionAreas = new Array<>();
         this.startPlayerLocation = new Vector2();
@@ -73,7 +73,7 @@ public class MyMap {
     }
 
     private void parsePLayerLocation(){
-        MapLayer startPlayerLocationLayer =tiledMap.getLayers().get("startPlayerLocation");
+        MapLayer startPlayerLocationLayer =tiledMap.getLayers().get("spawnLocation");
         final MapObjects mapObjects = startPlayerLocationLayer.getObjects();
         for (MapObject mapObject : mapObjects) {
             if (mapObject instanceof RectangleMapObject) {

@@ -21,7 +21,7 @@
   </object>
  </objectgroup>
  <objectgroup id="3" name="gameObjects"/>
- <objectgroup id="4" name="startPlayerLocation" visible="0">
+ <objectgroup id="4" name="spawnLocation" visible="0">
   <object id="1" x="48" y="112">
    <point/>
   </object>

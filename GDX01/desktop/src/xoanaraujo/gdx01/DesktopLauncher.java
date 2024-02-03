@@ -6,7 +6,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import xoanaraujo.gdx01.util.GameConst;
 
-import static xoanaraujo.gdx01.util.GameConst.UNIT_SCALE;
+import static xoanaraujo.gdx01.util.GameConst.*;
 
 
 // Please note that on macOS your application needs to be started with the -XstartOnFirstThread JVM argument
@@ -17,7 +17,7 @@ public class DesktopLauncher {
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
         config.setTitle("GDX01");
         config.setForegroundFPS(60);
-        config.setWindowedMode(GameConst.WIDTH, (GameConst.HEIGHT));
+        config.setWindowedMode(WIDTH, (HEIGHT));
         new Lwjgl3Application(new Core(), config);
     }
 }

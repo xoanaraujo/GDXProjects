@@ -29,7 +29,9 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import xoanaraujo.gdx01.audio.AudioManager;
 import xoanaraujo.gdx01.audio.AudioType;
+import xoanaraujo.gdx01.ecs.ECSEngine;
 import xoanaraujo.gdx01.input.InputManager;
+import xoanaraujo.gdx01.map.MapManager;
 import xoanaraujo.gdx01.screen.ScreenType;
 import xoanaraujo.gdx01.util.GameConst;
 
@@ -42,11 +44,13 @@ public class Core extends Game {
     private EnumMap<ScreenType, Screen> screens;
     private FitViewport viewport;
     private OrthographicCamera camera;
+    private ECSEngine ecsEngine;
     private World world;
     private WorldContactAdapter worldContactAdapter;
     private Box2DDebugRenderer debugRenderer;
     private InputManager inputManager;
     private AssetManager assetManager;
+    private MapManager mapManager;
     private AudioManager audioManager;
     private Stage stage;
     private Skin skin;
@@ -74,6 +78,7 @@ public class Core extends Game {
         world.setContactListener(worldContactAdapter);
         debugRenderer = new Box2DDebugRenderer();
 
+
         // AssetManager
         assetManager = new AssetManager();
         assetManager.setLoader(TiledMap.class, new TmxMapLoader(assetManager.getFileHandleResolver()));
@@ -83,15 +88,22 @@ public class Core extends Game {
         // Audio Manager
         audioManager = new AudioManager(this);
         for (final AudioType audioType : AudioType.values()) {
-            if (audioType.isMusic())
+            if (audioType.isMusic()) {
                 assetManager.load(audioType.getPath(), Music.class);
-            else
+            }
+            else {
                 assetManager.load(audioType.getPath(), Sound.class);
+            }
         }
+
+        // Map Manager
+        mapManager = new MapManager(this);
 
         // Input
         inputManager = new InputManager();
         Gdx.input.setInputProcessor(new InputMultiplexer(inputManager, stage));
+
+        ecsEngine = new ECSEngine(this);
 
         switchScreen(ScreenType.LOADING);
     }
@@ -131,6 +143,9 @@ public class Core extends Game {
     @Override
     public void render() {
         super.render();
+
+        ecsEngine.update(Gdx.app.getGraphics().getDeltaTime());
+
 		updateTime += Gdx.app.getGraphics().getDeltaTime();
         while (updateTime >= FIXED_TIME_STEP){
             world.step(FIXED_TIME_STEP, 6, 2);
@@ -200,6 +215,10 @@ public class Core extends Game {
         return assetManager;
     }
 
+    public MapManager getMapManager() {
+        return mapManager;
+    }
+
     public AudioManager getAudioManager() {
         return audioManager;
     }
@@ -222,5 +241,9 @@ public class Core extends Game {
 
     public InputManager getInputManager() {
         return inputManager;
+    }
+
+    public ECSEngine getEcsEngine() {
+        return ecsEngine;
     }
 }

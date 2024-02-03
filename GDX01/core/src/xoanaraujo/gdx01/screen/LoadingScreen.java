@@ -9,7 +9,9 @@ import xoanaraujo.gdx01.Core;
 import xoanaraujo.gdx01.audio.AudioType;
 import xoanaraujo.gdx01.input.GameKeys;
 import xoanaraujo.gdx01.input.InputManager;
+import xoanaraujo.gdx01.map.MapType;
 import xoanaraujo.gdx01.ui.LoadingUI;
+
 
 public class LoadingScreen extends AbstractScreen<LoadingUI>{
     private static final String TAG = LoadingScreen.class.getSimpleName();
@@ -19,7 +21,10 @@ public class LoadingScreen extends AbstractScreen<LoadingUI>{
     public LoadingScreen(Core context) {
         super(context);
         assetManager = context.getAssetManager();
-        assetManager.load("map/map.tmx", TiledMap.class);
+
+        for (MapType mapType : MapType.values()) {
+            assetManager.load(mapType.getPath(), TiledMap.class);
+        }
     }
 
     @Override
