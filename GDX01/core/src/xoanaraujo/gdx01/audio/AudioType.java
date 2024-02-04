@@ -1,8 +1,9 @@
 package xoanaraujo.gdx01.audio;
 
 public enum AudioType {
-    MAIN("audio/main.wav", true, 0.3f),
-    ZELDA("audio/zelda_music.wav", true, 0.3f);
+    MAIN("audio/zelda_music.wav", true, 0.1f),
+    ZELDA("audio/zelda_music.wav", true, 0.1f),
+    CHRONO("audio/chrono.mp3", true, 0.1f);
     private final String path;
     private final boolean isMusic;
     private final float volume;

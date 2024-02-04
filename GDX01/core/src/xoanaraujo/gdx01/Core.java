@@ -12,12 +12,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2D;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -33,7 +31,6 @@ import xoanaraujo.gdx01.ecs.ECSEngine;
 import xoanaraujo.gdx01.input.InputManager;
 import xoanaraujo.gdx01.map.MapManager;
 import xoanaraujo.gdx01.screen.ScreenType;
-import xoanaraujo.gdx01.util.GameConst;
 
 import java.util.EnumMap;
 
@@ -45,9 +42,9 @@ public class Core extends Game {
     private FitViewport viewport;
     private OrthographicCamera camera;
     private ECSEngine ecsEngine;
+    private GameRenderer gameRenderer;
     private World world;
     private WorldContactAdapter worldContactAdapter;
-    private Box2DDebugRenderer debugRenderer;
     private InputManager inputManager;
     private AssetManager assetManager;
     private MapManager mapManager;
@@ -76,7 +73,6 @@ public class Core extends Game {
         world = new World(new Vector2(0, 0f), true);
         worldContactAdapter = new WorldContactAdapter();
         world.setContactListener(worldContactAdapter);
-        debugRenderer = new Box2DDebugRenderer();
 
 
         // AssetManager
@@ -90,8 +86,7 @@ public class Core extends Game {
         for (final AudioType audioType : AudioType.values()) {
             if (audioType.isMusic()) {
                 assetManager.load(audioType.getPath(), Music.class);
-            }
-            else {
+            } else {
                 assetManager.load(audioType.getPath(), Sound.class);
             }
         }
@@ -103,7 +98,11 @@ public class Core extends Game {
         inputManager = new InputManager();
         Gdx.input.setInputProcessor(new InputMultiplexer(inputManager, stage));
 
+        // ecs engine
         ecsEngine = new ECSEngine(this);
+
+        // GameRenderer
+        gameRenderer = new GameRenderer(this);
 
         switchScreen(ScreenType.LOADING);
     }
@@ -135,7 +134,7 @@ public class Core extends Game {
         assetManager.load("ui/hud/hud.json", Skin.class, skinParameter);
         assetManager.load("ui/strings", I18NBundle.class);
         assetManager.finishLoading();
-        skin = assetManager.get("ui/hud/hud.json",Skin.class);
+        skin = assetManager.get("ui/hud/hud.json", Skin.class);
         i18NBundle = assetManager.get("ui/strings", I18NBundle.class);
 
     }
@@ -143,17 +142,16 @@ public class Core extends Game {
     @Override
     public void render() {
         super.render();
+        final float deltaTime = Math.min(0.25f, Gdx.graphics.getDeltaTime());
+        ecsEngine.update(deltaTime);
 
-        ecsEngine.update(Gdx.app.getGraphics().getDeltaTime());
-
-		updateTime += Gdx.app.getGraphics().getDeltaTime();
-        while (updateTime >= FIXED_TIME_STEP){
+        updateTime += deltaTime;
+        while (updateTime >= FIXED_TIME_STEP) {
             world.step(FIXED_TIME_STEP, 6, 2);
-            debugRenderer.render(world, viewport.getCamera().combined);
-			updateTime -= FIXED_TIME_STEP;
+            updateTime -= FIXED_TIME_STEP;
         }
 
-        //  final float alpha = updateTime / FIXED_TIME_STEP;
+        gameRenderer.render(updateTime / FIXED_TIME_STEP);
         stage.getViewport().apply();
         stage.act();
         stage.draw();
@@ -164,10 +162,10 @@ public class Core extends Game {
     public void dispose() {
         super.dispose();
         world.dispose();
-        debugRenderer.dispose();
         assetManager.dispose();
         stage.dispose();
         batch.dispose();
+        gameRenderer.dispose();
     }
 
     /**
@@ -207,9 +205,6 @@ public class Core extends Game {
         return world;
     }
 
-    public Box2DDebugRenderer getDebugRenderer() {
-        return debugRenderer;
-    }
 
     public AssetManager getAssetManager() {
         return assetManager;

@@ -10,6 +10,7 @@ public class GameConst {
     public static final int FPS = 60;
     public static final short BIT_GROUND = 1 << 0;
     public static final short BIT_PLAYER = 1 << 1;
+    public static final short BIT_GAME_OBJECT = 1 << 2;
 
     public static final FixtureDef FIXTURE_DEF = new FixtureDef();
     public static final BodyDef BODY_DEF = new BodyDef();

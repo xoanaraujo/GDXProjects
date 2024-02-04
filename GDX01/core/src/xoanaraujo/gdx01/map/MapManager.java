@@ -1,5 +1,6 @@
 package xoanaraujo.gdx01.map;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -8,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.ChainShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import xoanaraujo.gdx01.Core;
+import xoanaraujo.gdx01.ecs.ECSEngine;
 import xoanaraujo.gdx01.util.GameConst;
 
 import java.util.EnumMap;
@@ -17,15 +19,19 @@ import static xoanaraujo.gdx01.util.GameConst.*;
 public class MapManager {
     private static final String TAG = MapManager.class.getSimpleName();
     private final World world;
-    private final AssetManager assetManager;
+    private final ECSEngine ecsEngine;
+    private final Array<Entity> gameObjectsToRemove;
     private final Array<Body> bodies;
+    private final AssetManager assetManager;
     private final MapType currentMapType;
     private GameMap currentMap;
     private final EnumMap<MapType, GameMap> mapCache;
-    private final Array<MapListener> listeners;
+    private Array<MapListener> listeners;
 
     public MapManager(Core context) {
         world = context.getWorld();
+        ecsEngine = context.getEcsEngine();
+        gameObjectsToRemove = new Array<>();
         assetManager = context.getAssetManager();
         bodies = new Array<>();
         mapCache = new EnumMap<>(MapType.class);
@@ -44,6 +50,7 @@ public class MapManager {
         if (currentMap != null){
             world.getBodies(bodies);
             destroyCollisions();
+            destroyGameObjects();
         }
         Gdx.app.debug(TAG, "Changing to map " + mapType);
         currentMap = mapCache.get(mapType);
@@ -55,10 +62,29 @@ public class MapManager {
         }
 
         spawnCollisionAreas();
+        spawnGameObjects();
 
         for (final MapListener listener : listeners) {
             listener.mapChange(currentMap);
         }
+    }
+
+    private void spawnGameObjects() {
+        for (final GameObject gameObject : currentMap.getGameObjects()) {
+            ecsEngine.createGameObject(gameObject);
+        }
+    }
+
+    private void destroyGameObjects() { // Double array needed. Every time you delete an entity all the others move 1 step forward to reallocate
+        for (Entity entity : ecsEngine.getEntities()) {
+            if (ECSEngine.gameObjectComponentMapper.get(entity) != null){
+                gameObjectsToRemove.add(entity);
+            }
+        }
+        for (final Entity entity : gameObjectsToRemove) {
+            ecsEngine.removeEntity(entity);
+        }
+        gameObjectsToRemove.clear();
     }
 
     private void destroyCollisions(){

@@ -3,6 +3,7 @@ package xoanaraujo.gdx01.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.utils.ScreenUtils;
 import xoanaraujo.gdx01.Core;
@@ -10,7 +11,8 @@ import xoanaraujo.gdx01.audio.AudioType;
 import xoanaraujo.gdx01.input.GameKeys;
 import xoanaraujo.gdx01.input.InputManager;
 import xoanaraujo.gdx01.map.MapType;
-import xoanaraujo.gdx01.ui.LoadingUI;
+import xoanaraujo.gdx01.view.ui.LoadingUI;
+import xoanaraujo.gdx01.view.animation.AnimatiomType;
 
 
 public class LoadingScreen extends AbstractScreen<LoadingUI>{
@@ -24,6 +26,9 @@ public class LoadingScreen extends AbstractScreen<LoadingUI>{
 
         for (MapType mapType : MapType.values()) {
             assetManager.load(mapType.getPath(), TiledMap.class);
+        }
+        for (AnimatiomType type : AnimatiomType.values()) {
+            assetManager.load(type.getPath(), TextureAtlas.class);
         }
     }
 
@@ -41,13 +46,11 @@ public class LoadingScreen extends AbstractScreen<LoadingUI>{
     @Override
     public void hide() {
         super.hide();
-        audioManager.stopMusic();
+
     }
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(BACKGROUND);
-
         assetManager.update();
         screenUI.updateProgressBar(assetManager.getProgress());
         if(!isMusicLoaded && assetManager.isLoaded(AudioType.ZELDA.getPath())){
