@@ -9,13 +9,10 @@ import com.badlogic.gdx.physics.box2d.*;
 import xoanaraujo.gdx01.Core;
 import xoanaraujo.gdx01.ecs.components.AnimationComponent;
 import xoanaraujo.gdx01.ecs.components.GameObjectComponent;
-import xoanaraujo.gdx01.ecs.system.AnimationSystem;
+import xoanaraujo.gdx01.ecs.system.*;
 import xoanaraujo.gdx01.ecs.components.Box2DComponent;
 import xoanaraujo.gdx01.ecs.components.PlayerComponent;
-import xoanaraujo.gdx01.ecs.system.PlayerAnimationSystem;
-import xoanaraujo.gdx01.ecs.system.PlayerCameraSystem;
-import xoanaraujo.gdx01.ecs.system.PlayerMovementSystem;
-import xoanaraujo.gdx01.map.GameObject;
+import xoanaraujo.gdx01.map.gameobject.GameObject;
 import xoanaraujo.gdx01.util.GameConst;
 import xoanaraujo.gdx01.view.animation.AnimatiomType;
 
@@ -39,17 +36,19 @@ public class ECSEngine extends PooledEngine {
         addSystem(new PlayerCameraSystem(context));
         addSystem(new AnimationSystem());
         addSystem(new PlayerAnimationSystem());
+
+        addSystem(new PlayerCollisionSystem(context));
     }
 
 
 
     public void createPlayer(final Vector2 spawnLocation, final float radius) {
-        final Entity player = this.createEntity();
+        final Entity playerEntity = this.createEntity();
 
         // Add components
         final PlayerComponent playerComponent = createComponent(PlayerComponent.class);
         playerComponent.velocity = 3f;
-        player.add(playerComponent);
+        playerEntity.add(playerComponent);
 
         resetBodyAndFixtureDefinition();
         final Box2DComponent box2DComponent = createComponent(Box2DComponent.class);
@@ -57,14 +56,14 @@ public class ECSEngine extends PooledEngine {
         BODY_DEF.fixedRotation = true;
         BODY_DEF.type = BodyDef.BodyType.DynamicBody;
         box2DComponent.body = world.createBody(BODY_DEF);
-        box2DComponent.body.setUserData("PLAYER");
+        box2DComponent.body.setUserData(playerEntity);
         box2DComponent.width = 1;
         box2DComponent.height = 1;
         box2DComponent.renderPosition.set(box2DComponent.body.getPosition());
 
         FIXTURE_DEF.friction = 0f;
         FIXTURE_DEF.filter.categoryBits = BIT_PLAYER;
-        FIXTURE_DEF.filter.maskBits = BIT_GROUND;
+        FIXTURE_DEF.filter.maskBits = BIT_GROUND | BIT_GAME_OBJECT;
 
         CircleShape circleShape = new CircleShape();
         circleShape.setRadius(radius);
@@ -73,15 +72,15 @@ public class ECSEngine extends PooledEngine {
         box2DComponent.body.createFixture(FIXTURE_DEF);
         circleShape.dispose();
 
-        player.add(box2DComponent);
+        playerEntity.add(box2DComponent);
 
         // Animation component
         final AnimationComponent animationComponent = createComponent(AnimationComponent.class);
         animationComponent.type = AnimatiomType.PLAYER_IDLE_DOWN;
         animationComponent.width = animationComponent.height = 48 * UNIT_SCALE;
-        player.add(animationComponent);
+        playerEntity.add(animationComponent);
 
-        addEntity(player);
+        addEntity(playerEntity);
     }
 
     public void createGameObject(final GameObject gameObject) {
@@ -109,7 +108,7 @@ public class ECSEngine extends PooledEngine {
         BODY_DEF.type = BodyDef.BodyType.StaticBody;
         BODY_DEF.position.set(gameObject.getPosition().x + halfW, gameObject.getPosition().y + halfH);
         box2DComponent.body = world.createBody(BODY_DEF);
-        box2DComponent.body.setUserData("GAMEOBJECT");
+        box2DComponent.body.setUserData(gameObjectEntity);
         box2DComponent.width = gameObject.getWidth();
         box2DComponent.height = gameObject.getHeight();
 

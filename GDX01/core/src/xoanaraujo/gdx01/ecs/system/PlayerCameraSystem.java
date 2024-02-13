@@ -8,12 +8,13 @@ import xoanaraujo.gdx01.Core;
 import xoanaraujo.gdx01.ecs.ECSEngine;
 import xoanaraujo.gdx01.ecs.components.Box2DComponent;
 import xoanaraujo.gdx01.ecs.components.PlayerComponent;
+import xoanaraujo.gdx01.ecs.components.RemoveEntityComponent;
 
 public class PlayerCameraSystem extends IteratingSystem {
     private final OrthographicCamera camera;
 
     public PlayerCameraSystem(Core context) {
-        super(Family.all(Box2DComponent.class).get());
+        super(Family.all(Box2DComponent.class, PlayerComponent.class).get());
         camera = context.getCamera();
     }
 

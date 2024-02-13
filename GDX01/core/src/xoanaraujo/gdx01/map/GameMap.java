@@ -21,6 +21,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
+import xoanaraujo.gdx01.map.gameobject.GameObject;
+import xoanaraujo.gdx01.map.gameobject.GameObjectType;
 
 import static xoanaraujo.gdx01.util.GameConst.UNIT_SCALE;
 
@@ -41,7 +43,7 @@ public class GameMap {
 
         parsePLayerLocation();
         parseCollisionLayer();
-        // parseGameObjectLayer();
+        parseGameObjectLayer();
     }
 
     private void parseGameObjectLayer() {

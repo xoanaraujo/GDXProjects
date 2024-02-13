@@ -44,7 +44,7 @@ public class Core extends Game {
     private ECSEngine ecsEngine;
     private GameRenderer gameRenderer;
     private World world;
-    private WorldContactAdapter worldContactAdapter;
+    private WorldContactListener worldContactListener;
     private InputManager inputManager;
     private AssetManager assetManager;
     private MapManager mapManager;
@@ -71,8 +71,8 @@ public class Core extends Game {
         Box2D.init();
         updateTime = 0f;
         world = new World(new Vector2(0, 0f), true);
-        worldContactAdapter = new WorldContactAdapter();
-        world.setContactListener(worldContactAdapter);
+        worldContactListener = new WorldContactListener();
+        world.setContactListener(worldContactListener);
 
 
         // AssetManager
@@ -91,15 +91,15 @@ public class Core extends Game {
             }
         }
 
-        // Map Manager
-        mapManager = new MapManager(this);
-
         // Input
         inputManager = new InputManager();
         Gdx.input.setInputProcessor(new InputMultiplexer(inputManager, stage));
 
         // ecs engine
         ecsEngine = new ECSEngine(this);
+
+        // Map Manager
+        mapManager = new MapManager(this);
 
         // GameRenderer
         gameRenderer = new GameRenderer(this);
@@ -240,5 +240,9 @@ public class Core extends Game {
 
     public ECSEngine getEcsEngine() {
         return ecsEngine;
+    }
+
+    public WorldContactListener getWorldContactListener() {
+        return worldContactListener;
     }
 }

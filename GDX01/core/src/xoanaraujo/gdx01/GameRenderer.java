@@ -71,7 +71,7 @@ public class GameRenderer implements Disposable, MapListener{
         tileMapLayers = new Array<>();
 
         profiler = new GLProfiler(Gdx.graphics);
-        profiler.disable();
+        profiler.enable();
         if (profiler.isEnabled()) {
             debugRenderer = new Box2DDebugRenderer();
             world = context.getWorld();
@@ -123,8 +123,8 @@ public class GameRenderer implements Disposable, MapListener{
             final Sprite keyFrame = animation.getKeyFrame(animationComponent.time);
             keyFrame.setOriginCenter();
             keyFrame.setBounds(
-                    box2DComponent.renderPosition.x,
-                    box2DComponent.renderPosition.y,
+                    box2DComponent.renderPosition.x - box2DComponent.width / 2,
+                    box2DComponent.renderPosition.y - box2DComponent.height / 2,
                     animationComponent.width,
                     animationComponent.height);
             keyFrame.setRotation(box2DComponent.body.getAngle() * MathUtils.radDeg);

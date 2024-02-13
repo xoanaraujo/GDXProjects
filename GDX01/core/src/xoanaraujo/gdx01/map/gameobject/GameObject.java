@@ -1,4 +1,4 @@
-package xoanaraujo.gdx01.map;
+package xoanaraujo.gdx01.map.gameobject;
 
 import com.badlogic.gdx.math.Vector2;
 

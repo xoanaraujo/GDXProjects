@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import xoanaraujo.gdx01.Core;
 import xoanaraujo.gdx01.ecs.ECSEngine;
+import xoanaraujo.gdx01.map.gameobject.GameObject;
 import xoanaraujo.gdx01.util.GameConst;
 
 import java.util.EnumMap;
