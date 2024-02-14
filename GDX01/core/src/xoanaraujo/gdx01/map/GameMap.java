@@ -59,6 +59,7 @@ public class GameMap {
                 final MapProperties tiledMapObjProperties = tiledMapObj.getProperties();
                 final MapProperties tileProperties = tiledMapObj.getTile().getProperties();
                 final GameObjectType objectType;
+                final Animation.PlayMode playMode;
                 if (tiledMapObjProperties.containsKey("type")){
                     objectType = GameObjectType.valueOf(tiledMapObjProperties.get("type", String.class));
                 } else if (tileProperties.containsKey("type")) {
@@ -68,9 +69,14 @@ public class GameMap {
                     continue;
                 }
 
+                if (objectType == GameObjectType.CHEST || objectType == GameObjectType.BOX){
+                    playMode = Animation.PlayMode.NORMAL;
+                } else {
+                    playMode = Animation.PlayMode.LOOP;
+                }
 
                 final int animationIndex = tiledMapObj.getTile().getId();
-                if (!createAnimation(animationIndex, tiledMapObj.getTile())){
+                if (!createAnimation(animationIndex, tiledMapObj.getTile(), playMode)){
                     Gdx.app.debug(TAG, "Could not create animation for tile "+ tiledMapObjProperties.get("id", Integer.class));
                     continue;
                 }
@@ -89,7 +95,7 @@ public class GameMap {
 
     }
 
-    private boolean createAnimation(int animationIndex, TiledMapTile tile) {
+    private boolean createAnimation(int animationIndex, TiledMapTile tile, Animation.PlayMode playMode) {
         Animation<Sprite> animation = mapAnimations.get(animationIndex);
         if (animation == null){
             Gdx.app.debug(TAG, "Creating a new map animation for tile " + tile.getId());
@@ -100,15 +106,15 @@ public class GameMap {
                 for (final StaticTiledMapTile staticTile : aniTile.getFrameTiles()) {
                     keyFrames[i++] = new Sprite(staticTile.getTextureRegion());
                 }
-                animation = new Animation<>(aniTile.getAnimationIntervals()[0] * 0.001f); // Libgdx just saves 1 frame-time  per animation, so we only check the first value. Also, the time is in milliseconds, so we convert it to secs.
-                animation.setPlayMode(Animation.PlayMode.LOOP);
+                animation = new Animation<>(aniTile.getAnimationIntervals()[0] * 0.001f, keyFrames); // Libgdx just saves 1 frame-time  per animation, so we only check the first value. Also, the time is in milliseconds, so we convert it to secs.
+                animation.setPlayMode(playMode);
             } else if (tile instanceof StaticTiledMapTile) {
                 animation = new Animation<>(0, new Sprite(tile.getTextureRegion()));
-                mapAnimations.put(animationIndex, animation);
             } else {
                 Gdx.app.debug(TAG, "Tile of type " + tile + "is not supported for map animations");
                 return false;
             }
+            mapAnimations.put(animationIndex, animation);
         }
 
         return true;

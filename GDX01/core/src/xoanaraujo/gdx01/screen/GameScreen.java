@@ -1,7 +1,10 @@
 package xoanaraujo.gdx01.screen;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import xoanaraujo.gdx01.Core;
+import xoanaraujo.gdx01.PreferenceManager;
 import xoanaraujo.gdx01.audio.AudioType;
 import xoanaraujo.gdx01.input.GameKeys;
 import xoanaraujo.gdx01.input.InputManager;
@@ -14,14 +17,17 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener{
     private static final String TAG = GameScreen.class.getSimpleName();
     private final MapManager mapManager;
     private final AssetManager assetManager;
+    private final PreferenceManager preferenceManager;
+    private Entity player;
 
     public GameScreen(Core context) {
         super(context);
         assetManager = context.getAssetManager();
         mapManager = context.getMapManager();
         mapManager.setMap(MapType.MAP_1);
-
-        context.getEcsEngine().createPlayer(mapManager.getCurrentMap().getStartPlayerLocation(), 0.33f);
+        context.getInputManager().addInputListener(this);
+        preferenceManager = context.getPreferenceManager();
+        player = context.getEcsEngine().createPlayer(mapManager.getCurrentMap().getStartPlayerLocation(), 0.33f);
     }
 
     @Override
@@ -65,7 +71,10 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener{
 
     @Override
     public void keyDown(InputManager manager, GameKeys gameKey) {
-
+        switch (gameKey){
+            case SELECT: preferenceManager.loadGameState(player);
+            case UP: preferenceManager.saveGameState(player);
+        }
     }
 
     @Override

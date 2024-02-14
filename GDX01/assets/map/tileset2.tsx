@@ -19,5 +19,11 @@
   <properties>
    <property name="type" value="CHEST"/>
   </properties>
+  <animation>
+   <frame tileid="106" duration="100"/>
+   <frame tileid="107" duration="0"/>
+   <frame tileid="109" duration="0"/>
+   <frame tileid="108" duration="0"/>
+  </animation>
  </tile>
 </tileset>

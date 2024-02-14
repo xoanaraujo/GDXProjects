@@ -1,8 +1,11 @@
 package xoanaraujo.gdx01.ecs;
 
+import box2dLight.PointLight;
+import box2dLight.RayHandler;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -24,11 +27,13 @@ public class ECSEngine extends PooledEngine {
     public static final ComponentMapper<AnimationComponent> animationComponentMapper = ComponentMapper.getFor(AnimationComponent.class);
     public static final ComponentMapper<GameObjectComponent> gameObjectComponentMapper = ComponentMapper.getFor(GameObjectComponent.class);
     private final World world;
+    private final RayHandler rayHandler;
     private final Vector2 localPosition, posBeforeRotation, posAfterRotation;
 
     public ECSEngine(Core context) {
         super();
         world = context.getWorld();
+        rayHandler = context.getRayHandler();
         localPosition = new Vector2();
         posBeforeRotation = new Vector2();
         posAfterRotation = new Vector2();
@@ -36,13 +41,14 @@ public class ECSEngine extends PooledEngine {
         addSystem(new PlayerCameraSystem(context));
         addSystem(new AnimationSystem());
         addSystem(new PlayerAnimationSystem());
+        addSystem(new LightSystem());
 
-        addSystem(new PlayerCollisionSystem(context));
+        addSystem(new CollisionSystem(context));
     }
 
 
 
-    public void createPlayer(final Vector2 spawnLocation, final float radius) {
+    public Entity createPlayer(final Vector2 spawnLocation, final float radius) {
         final Entity playerEntity = this.createEntity();
 
         // Add components
@@ -74,6 +80,13 @@ public class ECSEngine extends PooledEngine {
 
         playerEntity.add(box2DComponent);
 
+        // create player light
+        box2DComponent.lightDistance = 6f;
+        box2DComponent.lightFluctuationSpeed = 4f;
+        box2DComponent.light = new PointLight(rayHandler, 128, new Color(1,1,0.8f,0.5f), box2DComponent.lightDistance, box2DComponent.body.getPosition().x, box2DComponent.body.getPosition().y);
+        box2DComponent.lightFluctuationDistance = box2DComponent.lightDistance * 0.1f;
+        box2DComponent.light.attachToBody(box2DComponent.body);
+
         // Animation component
         final AnimationComponent animationComponent = createComponent(AnimationComponent.class);
         animationComponent.type = AnimatiomType.PLAYER_IDLE_DOWN;
@@ -81,6 +94,7 @@ public class ECSEngine extends PooledEngine {
         playerEntity.add(animationComponent);
 
         addEntity(playerEntity);
+        return playerEntity;
     }
 
     public void createGameObject(final GameObject gameObject) {
@@ -97,6 +111,7 @@ public class ECSEngine extends PooledEngine {
         animationComponent.type = null;
         animationComponent.width = gameObject.getWidth();
         animationComponent.height = gameObject.getHeight();
+        animationComponent.paused = true;
         gameObjectEntity.add(animationComponent);
 
         // Box2D component

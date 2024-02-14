@@ -1,5 +1,6 @@
 package xoanaraujo.gdx01;
 
+import box2dLight.RayHandler;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
@@ -17,6 +18,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import xoanaraujo.gdx01.ecs.ECSEngine;
 import xoanaraujo.gdx01.ecs.components.AnimationComponent;
@@ -38,7 +40,7 @@ public class GameRenderer implements Disposable, MapListener{
     private static final String TAG = GameRenderer.class.getSimpleName();
     private final Color backgroundColor;
     private final OrthographicCamera camera;
-    private final FitViewport viewport;
+    private final ExtendViewport viewport;
     private final SpriteBatch batch;
     private final AssetManager assetManager;
     private final EnumMap<AnimatiomType, Animation<Sprite>> animationCache;
@@ -51,6 +53,7 @@ public class GameRenderer implements Disposable, MapListener{
     private final GLProfiler profiler;
     private final Box2DDebugRenderer debugRenderer;
     private final World world;
+    private final RayHandler rayHandler;
     private IntMap<Animation<Sprite>> mapAnimations;
 
     public GameRenderer(final Core context) {
@@ -59,6 +62,7 @@ public class GameRenderer implements Disposable, MapListener{
         viewport = context.getViewport();
         camera = context.getCamera();
         batch = context.getBatch();
+
 
         animationCache = new EnumMap<>(AnimatiomType.class);
         regionCache = new ObjectMap<>();
@@ -71,7 +75,7 @@ public class GameRenderer implements Disposable, MapListener{
         tileMapLayers = new Array<>();
 
         profiler = new GLProfiler(Gdx.graphics);
-        profiler.enable();
+        profiler.disable();
         if (profiler.isEnabled()) {
             debugRenderer = new Box2DDebugRenderer();
             world = context.getWorld();
@@ -79,6 +83,7 @@ public class GameRenderer implements Disposable, MapListener{
             debugRenderer = null;
             world = null;
         }
+        rayHandler = context.getRayHandler();
     }
 
     public void render(final float alpha) {
@@ -104,6 +109,10 @@ public class GameRenderer implements Disposable, MapListener{
             renderEntity(entity, alpha);
         }
         batch.end();
+
+        rayHandler.setCombinedMatrix(camera);
+        rayHandler.updateAndRender();
+
         if (profiler.isEnabled()) {
             Gdx.app.debug(TAG, "Bindings: " + profiler.getTextureBindings());
             Gdx.app.debug(TAG, "Drawcalls: " + profiler.getDrawCalls());
@@ -115,10 +124,11 @@ public class GameRenderer implements Disposable, MapListener{
 
     private void renderGameObject(Entity entity, float alpha) {
         final Box2DComponent box2DComponent = ECSEngine.box2DComponentMapper.get(entity);
-        final AnimationComponent animationComponent = ECSEngine.animationComponentMapper.get(entity);
         final GameObjectComponent gameObjectComponent = ECSEngine.gameObjectComponentMapper.get(entity);
 
         if (gameObjectComponent.animationIndex != -1) {
+            final AnimationComponent animationComponent = ECSEngine.animationComponentMapper.get(entity);
+            Gdx.app.debug(TAG, "" + animationComponent.time);
             final Animation<Sprite> animation = mapAnimations.get(gameObjectComponent.animationIndex);
             final Sprite keyFrame = animation.getKeyFrame(animationComponent.time);
             keyFrame.setOriginCenter();

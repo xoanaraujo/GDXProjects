@@ -14,7 +14,7 @@ public class PlayerCameraSystem extends IteratingSystem {
     private final OrthographicCamera camera;
 
     public PlayerCameraSystem(Core context) {
-        super(Family.all(Box2DComponent.class, PlayerComponent.class).get());
+        super(Family.all(PlayerComponent.class).get());
         camera = context.getCamera();
     }
 

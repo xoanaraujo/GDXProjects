@@ -1,5 +1,7 @@
 package xoanaraujo.gdx01;
 
+import box2dLight.Light;
+import box2dLight.RayHandler;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.SkinLoader;
@@ -24,6 +26,7 @@ import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import xoanaraujo.gdx01.audio.AudioManager;
 import xoanaraujo.gdx01.audio.AudioType;
@@ -39,16 +42,18 @@ import static xoanaraujo.gdx01.util.GameConst.*;
 public class Core extends Game {
     private static final String TAG = Core.class.getSimpleName();
     private EnumMap<ScreenType, Screen> screens;
-    private FitViewport viewport;
+    private ExtendViewport viewport;
     private OrthographicCamera camera;
     private ECSEngine ecsEngine;
     private GameRenderer gameRenderer;
     private World world;
     private WorldContactListener worldContactListener;
+    private RayHandler rayHandler;
     private InputManager inputManager;
     private AssetManager assetManager;
     private MapManager mapManager;
     private AudioManager audioManager;
+    private PreferenceManager preferenceManager;
     private Stage stage;
     private Skin skin;
     private I18NBundle i18NBundle;
@@ -64,7 +69,7 @@ public class Core extends Game {
         // Screen stuff
         screens = new EnumMap<>(ScreenType.class);
         camera = new OrthographicCamera();
-        viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
+        viewport = new ExtendViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
 
 
         // Physics with Box2D
@@ -74,12 +79,14 @@ public class Core extends Game {
         worldContactListener = new WorldContactListener();
         world.setContactListener(worldContactListener);
 
-
+        rayHandler = new RayHandler(world);
+        rayHandler.setAmbientLight(0, 0, 0, 0.4f);
+        Light.setGlobalContactFilter(BIT_PLAYER, (short) 1, BIT_GROUND);
         // AssetManager
         assetManager = new AssetManager();
         assetManager.setLoader(TiledMap.class, new TmxMapLoader(assetManager.getFileHandleResolver()));
         initializeSkin();
-        stage = new Stage(new FitViewport(WIDTH, HEIGHT), batch);
+        stage = new Stage(new ExtendViewport(WIDTH, HEIGHT), batch);
 
         // Audio Manager
         audioManager = new AudioManager(this);
@@ -100,6 +107,9 @@ public class Core extends Game {
 
         // Map Manager
         mapManager = new MapManager(this);
+
+        // Preference manager
+        preferenceManager = new PreferenceManager();
 
         // GameRenderer
         gameRenderer = new GameRenderer(this);
@@ -166,6 +176,7 @@ public class Core extends Game {
         stage.dispose();
         batch.dispose();
         gameRenderer.dispose();
+        rayHandler.dispose();
     }
 
     /**
@@ -193,7 +204,7 @@ public class Core extends Game {
         return screens;
     }
 
-    public FitViewport getViewport() {
+    public ExtendViewport getViewport() {
         return viewport;
     }
 
@@ -244,5 +255,13 @@ public class Core extends Game {
 
     public WorldContactListener getWorldContactListener() {
         return worldContactListener;
+    }
+
+    public RayHandler getRayHandler() {
+        return rayHandler;
+    }
+
+    public PreferenceManager getPreferenceManager() {
+        return preferenceManager;
     }
 }

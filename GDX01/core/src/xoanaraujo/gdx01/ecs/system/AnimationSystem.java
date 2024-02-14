@@ -14,7 +14,7 @@ public class AnimationSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         final AnimationComponent animationComponent = ECSEngine.animationComponentMapper.get(entity);
-        if (animationComponent.type != null){
+        if (!animationComponent.paused){
             animationComponent.time += deltaTime;
         }
     }

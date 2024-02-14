@@ -10,6 +10,8 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import xoanaraujo.gdx01.Core;
 import xoanaraujo.gdx01.ecs.ECSEngine;
+import xoanaraujo.gdx01.ecs.system.CollisionSystem;
+import xoanaraujo.gdx01.ecs.system.CollisionSystemListener;
 import xoanaraujo.gdx01.map.gameobject.GameObject;
 import xoanaraujo.gdx01.util.GameConst;
 
@@ -21,6 +23,7 @@ public class MapManager {
     private static final String TAG = MapManager.class.getSimpleName();
     private final World world;
     private final ECSEngine ecsEngine;
+    private final CollisionSystemListener collisionSystemListener;
     private final Array<Entity> gameObjectsToRemove;
     private final Array<Body> bodies;
     private final AssetManager assetManager;
@@ -32,6 +35,7 @@ public class MapManager {
     public MapManager(Core context) {
         world = context.getWorld();
         ecsEngine = context.getEcsEngine();
+        collisionSystemListener =ecsEngine.getSystem(CollisionSystem.class);
         gameObjectsToRemove = new Array<>();
         assetManager = context.getAssetManager();
         bodies = new Array<>();
@@ -68,6 +72,7 @@ public class MapManager {
         for (final MapListener listener : listeners) {
             listener.mapChange(currentMap);
         }
+        collisionSystemListener.updateMapObjects(currentMap);
     }
 
     private void spawnGameObjects() {
