@@ -2,6 +2,7 @@ package xoanaraujo.gdx01;
 
 import box2dLight.Light;
 import box2dLight.RayHandler;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.SkinLoader;
@@ -60,6 +61,7 @@ public class Core extends Game {
     private SpriteBatch batch;
     private static final Float FIXED_TIME_STEP = 1f / FPS;
     private Float updateTime;
+    private Entity player;
 
     @Override
     public void create() {
@@ -177,6 +179,7 @@ public class Core extends Game {
         batch.dispose();
         gameRenderer.dispose();
         rayHandler.dispose();
+        preferenceManager.saveGameState(player);
     }
 
     /**
@@ -263,5 +266,13 @@ public class Core extends Game {
 
     public PreferenceManager getPreferenceManager() {
         return preferenceManager;
+    }
+
+    public void setPlayer(Entity player) {
+        this.player = player;
+    }
+
+    public Entity getPlayer() {
+        return player;
     }
 }

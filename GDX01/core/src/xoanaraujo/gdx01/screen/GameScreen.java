@@ -18,8 +18,7 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener{
     private final MapManager mapManager;
     private final AssetManager assetManager;
     private final PreferenceManager preferenceManager;
-    private Entity player;
-
+    private final Entity player;
     public GameScreen(Core context) {
         super(context);
         assetManager = context.getAssetManager();
@@ -27,7 +26,8 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener{
         mapManager.setMap(MapType.MAP_1);
         context.getInputManager().addInputListener(this);
         preferenceManager = context.getPreferenceManager();
-        player = context.getEcsEngine().createPlayer(mapManager.getCurrentMap().getStartPlayerLocation(), 0.33f);
+        context.setPlayer( context.getEcsEngine().createPlayer(mapManager.getCurrentMap().getStartPlayerLocation(), 0.33f));
+        player = context.getPlayer();
     }
 
     @Override
@@ -67,13 +67,13 @@ public class GameScreen extends AbstractScreen<GameUI> implements MapListener{
 
     @Override
     public void dispose() {
+
     }
 
     @Override
     public void keyDown(InputManager manager, GameKeys gameKey) {
-        switch (gameKey){
-            case SELECT: preferenceManager.loadGameState(player);
-            case UP: preferenceManager.saveGameState(player);
+        if(gameKey == GameKeys.SELECT){
+            preferenceManager.loadGameState(player);
         }
     }
 
